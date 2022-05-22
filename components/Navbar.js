@@ -1,7 +1,7 @@
 // import { InjectedConnector } from "@wagmi/core";
 import Link from "next/link";
 import { useAccount, useConnect } from "wagmi";
-import { useEffect } from "react"
+
 
 export default function Navbar() {
     const { isConnected } = useConnect();
@@ -23,9 +23,6 @@ export default function Navbar() {
                 <div className="flex flex-row justify-end content-center">
                     <Link href="/daos">
                         <a className="mr-3 mt-2">DAOs</a>
-                    </Link>
-                    <Link href="/nfts">
-                        <a className="mr-3 mt-2">NFTs</a>
                     </Link>
                     <div className="bg-black text-white rounded-lg p-2">
                         {isConnected? truncate(data.address) : "Connect Wallet"}

@@ -1,8 +1,10 @@
 import { create } from "ipfs-http-client";
 import { useRef } from "react";
+import { useDispatch } from "react-redux";
 import { useContract, useSigner } from "wagmi";
 import { DIS3CORD_ADDRESS } from "../Addresses";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
+import { refreshUserDaosAsync } from "../store/reducers/userdaoreducer";
 
 const client = create("https://ipfs.infura.io:5001/api/v0");
 
@@ -18,6 +20,7 @@ export default function CreateDaoPopUp() {
         contractInterface: Dis3cord["abi"],
         signerOrProvider: data,
     });
+    let dispatch = useDispatch();
 
     let handleCreateDAO = (e) => {
         let curr = formRef.current;
@@ -40,6 +43,7 @@ export default function CreateDaoPopUp() {
         nameRef.current.value = "";
         descRef.current.value = "";
         formRef.current.style.display = "none";
+        dispatch(refreshUserDaosAsync(data, dis3cord));
     };
 
     return (

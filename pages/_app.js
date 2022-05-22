@@ -1,7 +1,9 @@
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { createClient, Provider } from "wagmi";
+import { Provider as StateProvider } from "react-redux";
 import Navbar from "../components/Navbar";
 import "../styles/globals.css";
+import store from "../store/store";
 
 const client = createClient({
     autoConnect: true,
@@ -11,8 +13,10 @@ const client = createClient({
 function MyApp({ Component, pageProps }) {
     return (
         <Provider client={client}>
-            <Navbar />
-            <Component {...pageProps} />
+            <StateProvider store={store}>
+                <Navbar />
+                <Component {...pageProps} />
+            </StateProvider>
         </Provider>
     );
 }
