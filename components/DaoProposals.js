@@ -22,7 +22,7 @@ export function DaoProposals({ props }) {
         if (data) {
             load();
         }
-    }, [data]);
+    }, [data, address]);
 
     async function submitProposal() {
         let time = timeRef.current.value.toString().trim();
@@ -34,6 +34,8 @@ export function DaoProposals({ props }) {
             timeSeconds
         );
         await txn.wait();
+        descriptionRef.current.value = "";
+        timeRef.current.value = "";
         load();
     }
 
@@ -55,7 +57,7 @@ export function DaoProposals({ props }) {
                     deadline: val["deadline"].toString(),
                     yes: val["noOfYes"].toString(),
                     no: val["noOfNo"].toString(),
-                    isExecutes: val["isExecuted"].toString(),
+                    isExecuted: val["isExecuted"].toString(),
                 };
             });
             setProposals(fmr);
@@ -75,76 +77,90 @@ export function DaoProposals({ props }) {
     };
 
     return (
-        <div>
-            <div className="m-3">
-                <p className="font-medium">
-                    NFT Price:{" "}
-                    {nftInfo.nftPrice
-                        ? ethers.utils.formatEther(nftInfo.nftPrice.toString())
-                        : ""}
-                </p>
-                <p className="font-medium">
-                    NFT Balance:{" "}
-                    {nftInfo.balance ? nftInfo.balance.toString() : ""}
-                </p>
-                <input
-                    className="mb-1 mt-1 border rounded-lg p-1"
-                    placeholder="Enter the no of nfts"
-                    type="number"
-                    ref={nftRef}
-                ></input>
-                <br></br>
-                <button
-                    className="p-1 rounded-md text-white bg-black"
-                    onClick={async () => {
-                        dis3dao.buyNFT(nftRef.current.value.toString(), {
-                            value: BigNumber.from(
-                                nftInfo.nftPrice.toString()
-                            ).mul(BigNumber.from(nftRef.current.value)),
-                        });
-                        set;
-                    }}
-                >
-                    Buy nfts
-                </button>
-            </div>
-            <div className="m-3">
-                {proposals.map((val, i) => (
-                    <div key={i}>
-                        <p>{val.description}</p>
-                        <p>
-                            {new Date(Number(val.deadline) * 1000).toString()}
-                        </p>
-                        <p>{val.yes}</p>
-                        <p>{val.no}</p>
-                        <p>{val.isExecuted}</p>
-                        <button
-                            className="bg-black text-white rounded-lg p-1"
-                            onClick={() => {
-                                vote(true, i);
-                            }}
-                        >
-                            Yes Vote
-                        </button>
-                        <button
-                            className="bg-black text-white rounded-lg p-1"
-                            onClick={() => {
-                                vote(false, i);
-                            }}
-                        >
-                            No Vote
-                        </button>
-                        <button
-                            className="bg-black text-white rounded-lg p-1"
-                            onClick={() => {
-                                execute(i);
-                            }}
-                        >
-                            Execute
-                        </button>
+        <div className="flex-none w-80 mx-2">
+            <div className="flex flex-col justify-between d-height">
+                <div className="mt-2 flex-none border-2 z-2 p-2">
+                    <div className="font-medium inline-block">
+                        NFT Price:{" "}
+                        {nftInfo.nftPrice
+                            ? ethers.utils.formatEther(
+                                  nftInfo.nftPrice.toString()
+                              )
+                            : ""}
                     </div>
-                ))}
-                <div className="border-2 rounded-lg p-2 flex flex-col">
+                    <div className="font-medium ml-2 inline-block">
+                        NFT Balance:{" "}
+                        {nftInfo.balance ? nftInfo.balance.toString() : ""}
+                    </div>
+                    <input
+                        className="my-2 border rounded-lg p-1 w-full"
+                        placeholder="Enter the no of nfts"
+                        type="number"
+                        ref={nftRef}
+                    ></input>
+                    <br></br>
+                    <button
+                        className="p-1 rounded-md text-white bg-black w-full"
+                        onClick={async () => {
+                            let txn = await dis3dao.buyNFT(
+                                nftRef.current.value.toString(),
+                                {
+                                    value: BigNumber.from(
+                                        nftInfo.nftPrice.toString()
+                                    ).mul(BigNumber.from(nftRef.current.value)),
+                                }
+                            );
+                            await txn.wait();
+                            load();
+                        }}
+                    >
+                        Buy nfts
+                    </button>
+                </div>
+                <div className="my-2 p-2 overflow-y-scroll border-2 z-2">
+                    {proposals.map((val, i) => (
+                        <div key={i} className="mb-2">
+                            <p className="font-bold">{val.description}</p>
+                            <p>
+                                Deadline:{"  "}
+                                {new Date(
+                                    Number(val.deadline) * 1000
+                                ).toString()}
+                            </p>
+                            <p>{"Yes Votes: " + val.yes}</p>
+                            <p>{"No Votes: " + val.no}</p>
+                            <p className="mb-2">{"Executed: " + val.isExecuted}</p>
+                            <button
+                                style={{ width: "31%" }}
+                                className="bg-black text-white rounded-lg p-1 "
+                                onClick={() => {
+                                    vote(true, i);
+                                }}
+                            >
+                                Yes Vote
+                            </button>
+                            <button
+                                style={{ width: "31%" }}
+                                className="bg-black text-white rounded-lg p-1 mx-2"
+                                onClick={() => {
+                                    vote(false, i);
+                                }}
+                            >
+                                No Vote
+                            </button>
+                            <button
+                                style={{ width: "31%" }}
+                                className="bg-black text-white rounded-lg p-1 "
+                                onClick={() => {
+                                    execute(i);
+                                }}
+                            >
+                                Execute
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <div className="border-2 flex-none p-2 mb-2 flex flex-col">
                     <label
                         htmlFor="description"
                         className="block mb-2 text-sm font-medium text-gray-900"

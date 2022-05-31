@@ -10,7 +10,7 @@ function DaoList({props}) {
     const { data } = useSigner();
     let dispatch = useDispatch();
     let daos = useSelector((state) => state.userDaos);
-    let { address, setAddress } = props;
+    let { setAddress } = props;
 
     const dis3cord = useContract({
         addressOrName: DIS3CORD_ADDRESS,
