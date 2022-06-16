@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useContract, useSigner } from "wagmi";
-import { DIS3CORD_ADDRESS } from "../Addresses";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
 import Dis3DAO from "../artifacts/contracts/Dis3DAO.sol/Dis3DAO.json";
 import { ethers } from "ethers";
 import CreateDaoPopUp from "./CreateDaoPopUp";
+
+let { NEXT_PUBLIC_DIS3CORD_ADDRESS} = process.env;
 
 function DaoList({ props }) {
     const { data } = useSigner();
@@ -12,7 +13,7 @@ function DaoList({ props }) {
     let { setAddress } = props;
 
     const dis3cord = useContract({
-        addressOrName: DIS3CORD_ADDRESS,
+        addressOrName: NEXT_PUBLIC_DIS3CORD_ADDRESS,
         contractInterface: Dis3cord.abi,
         signerOrProvider: data,
     });
@@ -40,7 +41,7 @@ function DaoList({ props }) {
 
     return (
         <div className="flex flex-col p-2 border-r-2 overscroll-contain">
-            <CreateDaoPopUp props={{ daos, setDaos }} />
+            <CreateDaoPopUp props={{ load }} />
             {daos.map((val, i) => {
                 return (
                     <button
@@ -54,7 +55,7 @@ function DaoList({ props }) {
                             style={{
                                 backgroundImage: `url(${val.url.toString()})`,
                                 backgroundSize: "cover",
-                                backgroundRepeat: "no-repeat"
+                                backgroundRepeat: "no-repeat",
                             }}
                         />
                         {/* <img src={val.url} alt={val.name} style={{backgroundSize:"48px"}} /> */}

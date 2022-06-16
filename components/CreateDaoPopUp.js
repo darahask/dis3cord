@@ -2,22 +2,22 @@ import { ethers } from "ethers";
 import { create } from "ipfs-http-client";
 import { useRef } from "react";
 import { useContract, useSigner } from "wagmi";
-import { DIS3CORD_ADDRESS } from "../Addresses";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
 
 const client = create("https://ipfs.infura.io:5001/api/v0");
+let { NEXT_PUBLIC_DIS3CORD_ADDRESS} = process.env;
 
-export default function CreateDaoPopUp({props}) {
+export default function CreateDaoPopUp({ props }) {
     const formRef = useRef(0);
     const nameRef = useRef(0);
     const descRef = useRef(0);
     const fileRef = useRef(0);
     const priceRef = useRef(0);
-    let {daos, setDaos} = props;
+    let { load } = props;
 
     let { data } = useSigner();
     let dis3cord = useContract({
-        addressOrName: DIS3CORD_ADDRESS,
+        addressOrName: NEXT_PUBLIC_DIS3CORD_ADDRESS,
         contractInterface: Dis3cord["abi"],
         signerOrProvider: data,
     });
@@ -44,11 +44,12 @@ export default function CreateDaoPopUp({props}) {
         nameRef.current.value = "";
         descRef.current.value = "";
         formRef.current.style.display = "none";
-        setDaos([...daos, {
-            name: nameRef.current.value,
-            addr: txn.toString(),
-            url: `https://ipfs.infura.io/ipfs/${fileCID.path}`,
-        }])
+        load();
+        // setDaos([...daos, {
+        //     name: nameRef.current.value,
+        //     addr: txn.toString(),
+        //     url: `https://ipfs.infura.io/ipfs/${fileCID.path}`,
+        // }])
     };
 
     return (
@@ -75,7 +76,7 @@ export default function CreateDaoPopUp({props}) {
 
             <div
                 ref={formRef}
-                className="fixed bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-1 border rounded-lg b-3 p-3 hidden drop-shadow-lg"
+                className="fixed bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 border rounded-lg b-3 p-3 hidden drop-shadow-lg"
             >
                 <form onSubmit={handleFormSubmit}>
                     <div className="mb-6">

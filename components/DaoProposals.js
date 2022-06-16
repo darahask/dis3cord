@@ -79,7 +79,7 @@ export function DaoProposals({ props }) {
     return (
         <div className="w-80 mx-2">
             <div className="flex flex-col justify-between d-height">
-                <div className="mt-2 flex-none border-2 z-2 p-2">
+                <div className="mt-2 flex-none border-2 z-2 p-2 drop-shadow bg-white">
                     <div className="font-medium inline-block">
                         NFT Price:{" "}
                         {nftInfo.nftPrice
@@ -117,7 +117,7 @@ export function DaoProposals({ props }) {
                         Buy nfts
                     </button>
                 </div>
-                <div className=" grow my-2 p-2 overflow-y-scroll border-2 z-2">
+                <div className="grow my-2 p-2 overflow-y-scroll border-2 z-2 drop-shadow bg-white">
                     <p className="font-bold border-b mb-1">Proposals</p>
                     {proposals.map((val, i) => (
                         <div key={i} className="mb-2">
@@ -163,7 +163,7 @@ export function DaoProposals({ props }) {
                         </div>
                     ))}
                 </div>
-                <div className="border-2 flex-none p-2 mb-2 flex flex-col">
+                <div className="border-2 flex-none p-2 mb-2 flex flex-col drop-shadow bg-white">
                     <label
                         htmlFor="description"
                         className="block mb-2 text-sm font-medium text-gray-900"

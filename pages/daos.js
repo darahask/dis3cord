@@ -16,7 +16,9 @@ export default function Daos() {
                 </>
             ) : (
                 <div className="grow relative">
-                    <p className="text-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-red-600 font-medium">Select a DAO</p>
+                    <p className="text-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-red-600 font-medium">
+                        Select a DAO
+                    </p>
                 </div>
             )}
         </div>

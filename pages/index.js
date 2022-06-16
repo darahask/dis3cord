@@ -1,18 +1,21 @@
-import { useState, useEffect } from "react";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
 import Dis3DAO from "../artifacts/contracts/Dis3DAO.sol/Dis3DAO.json";
-import { DIS3CORD_ADDRESS } from "../Addresses";
-import { ethers } from "ethers";
+import { useState, useEffect, useRef } from "react";
 import { useSigner, useContract } from "wagmi";
+import Search from "../components/Search";
+import { ethers } from "ethers";
+
+let { NEXT_PUBLIC_DIS3CORD_ADDRESS} = process.env;
 
 export default function Home() {
     let [daos, setDaos] = useState([]);
     const { data } = useSigner();
     const dis3cord = useContract({
-        addressOrName: DIS3CORD_ADDRESS,
+        addressOrName: NEXT_PUBLIC_DIS3CORD_ADDRESS,
         contractInterface: Dis3cord.abi,
         signerOrProvider: data,
     });
+    let totalDaos = useRef([]);
 
     async function load() {
         let listOfDaos = await dis3cord.getAllDAOs();
@@ -22,11 +25,13 @@ export default function Home() {
                 name: await dis3dao.dname(),
                 address: addr,
                 price: await dis3dao.nftPrice(),
+                description: await dis3dao.description(),
                 url: `https://ipfs.infura.io/ipfs/${await dis3dao.imageCID()}`,
             };
         });
         Promise.all(funcs).then((vals) => {
             setDaos(vals);
+            totalDaos.current = vals;
         });
     }
 
@@ -47,42 +52,47 @@ export default function Home() {
     }, [data]);
 
     return (
-        <div className="grid grid-cols-4 gap-4 m-4">
-            {daos.map((val, i) => {
-                return (
-                    <div
-                        key={i}
-                        className="border shadow rounded-xl overflow-hidden"
-                    >
+        <div>
+            <Search props={{ totalDaos, daos, setDaos }}></Search>
+            <div className="grid grid-cols-4 gap-4 m-4">
+                {daos.map((val, i) => {
+                    return (
                         <div
-                            className="h-48 w-full"
-                            style={{
-                                backgroundImage: `url(${val.url.toString()})`,
-                                backgroundSize: "cover",
-                                backgroundRepeat: "no-repeat"
-                            }}
-                        />
-                        <div className="p-4">
-                            <p
-                                className="text-2xl font-semibold"
-                            >
-                                {val.name.toString()}
-                            </p>
+                            key={i}
+                            className="border shadow rounded-xl overflow-hidden"
+                        >
+                            <div
+                                className="h-48 w-full"
+                                style={{
+                                    backgroundImage: `url(${val.url.toString()})`,
+                                    backgroundSize: "cover",
+                                    backgroundRepeat: "no-repeat",
+                                }}
+                            />
+                            <div className="p-4">
+                                <p className="text-2xl font-semibold">
+                                    {val.name.toString()}
+                                </p>
+                            </div>
+                            <div className="p-4 bg-black">
+                                <p className="text-2xl font-bold text-white">
+                                    NFT:{" "}
+                                    {ethers.utils.formatEther(
+                                        daos[i].price.toString()
+                                    )}{" "}
+                                    ETH
+                                </p>
+                                <button
+                                    className="mt-4 w-full bg-red-500 text-white font-bold py-2 px-12 rounded"
+                                    onClick={() => handleJoin(i)}
+                                >
+                                    Join
+                                </button>
+                            </div>
                         </div>
-                        <div className="p-4 bg-black">
-                            <p className="text-2xl font-bold text-white">
-                                NFT: {ethers.utils.formatEther(daos[i].price.toString())} ETH
-                            </p>
-                            <button
-                                className="mt-4 w-full bg-red-500 text-white font-bold py-2 px-12 rounded"
-                                onClick={() => handleJoin(i)}
-                            >
-                                Join
-                            </button>
-                        </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </div>
     );
 }

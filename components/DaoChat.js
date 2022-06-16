@@ -20,6 +20,7 @@ export default function DaoChat({ props }) {
     let messageRef = useRef();
     let chatRef = useRef();
     let titleRef = useRef();
+    let descRef = useRef();
 
     let { data } = useSigner();
     let dis3dao = useContract({
@@ -76,7 +77,11 @@ export default function DaoChat({ props }) {
 
     let loadMessages = async () => {
         if (isAuthenticated) {
-            titleRef.current.innerText = (await dis3dao.dname()).toString() + " DAO";
+            titleRef.current.innerText =
+                (await dis3dao.dname()).toString() + " DAO";
+            descRef.current.innerText = (
+                await dis3dao.description()
+            ).toString();
             let res = await fetch();
             setMessages(
                 res.map((msg, _) => ({
@@ -91,8 +96,14 @@ export default function DaoChat({ props }) {
     return (
         <div className="grow ml-3">
             <div className="flex flex-col d-height pt-2">
-                <div ref={titleRef} className="text-xl font-semibold mb-3 pl-2 drop-shadow border rounded-md"></div>
-                <div ref={chatRef} className=" grow overflow-y-scroll border rounded-md p-2">
+                <div className="mb-3 pl-2 drop-shadow border rounded-md bg-white">
+                    <p ref={titleRef} className="text-xl font-semibold "></p>
+                    <p ref={descRef}></p>
+                </div>
+                <div
+                    ref={chatRef}
+                    className=" grow overflow-y-scroll drop-shadow bg-white border rounded-md p-2"
+                >
                     {messages.map((msg, i) => (
                         <div key={i} className="mb-2 border-b">
                             <p className="font-semibold text-red-600">
@@ -102,7 +113,7 @@ export default function DaoChat({ props }) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-row w-full my-3">
+                <div className="flex flex-row w-full my-3 drop-shadow">
                     <input
                         className="border grow rounded-lg p-2"
                         ref={messageRef}

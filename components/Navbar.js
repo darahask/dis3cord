@@ -9,7 +9,7 @@ export default function Navbar() {
     const { authenticate } = useMoralis();
 
     useEffect(() => {
-        if(data){
+        if (data) {
             authenticate({
                 signingMessage: "Sign in to Dis3cord chat services",
             }).catch(function (error) {

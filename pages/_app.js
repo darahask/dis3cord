@@ -3,6 +3,7 @@ import { createClient, Provider } from "wagmi";
 import Navbar from "../components/Navbar";
 import "../styles/globals.css";
 import { MoralisProvider } from "react-moralis";
+import Head from "next/head";
 
 const client = createClient({
     autoConnect: true,
@@ -11,7 +12,12 @@ const client = createClient({
 
 function MyApp({ Component, pageProps }) {
     return (
-        <MoralisProvider
+        <div>
+            <Head>
+                <title>Dis3cord</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+            </Head>
+            <MoralisProvider
             appId={process.env.NEXT_PUBLIC_MORALIS_APPLICATION_ID}
             serverUrl={process.env.NEXT_PUBLIC_MORALIS_SERVER_URL}
         >
@@ -20,6 +26,7 @@ function MyApp({ Component, pageProps }) {
                 <Component {...pageProps} />
             </Provider>
         </MoralisProvider>
+        </div>
     );
 }
 
