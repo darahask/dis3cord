@@ -5,21 +5,20 @@ import { DaoProposals } from "../components/DaoProposals";
 
 export default function Daos() {
     let [address, setAddress] = useState("");
-    
+
     return (
         <div className="flex flex-row d-height">
             <DaoList props={{ address, setAddress }} />
             {address && address != "" ? (
-                <DaoChat props={{address}}/>
+                <>
+                    <DaoChat props={{ address }} />
+                    <DaoProposals props={{ address, setAddress }} />
+                </>
             ) : (
-                <></>
+                <div className="grow relative">
+                    <p className="text-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-red-600 font-medium">Select a DAO</p>
+                </div>
             )}
-            {address && address != "" ? (
-                <DaoProposals props={{ address, setAddress }} />
-            ) : (
-                <></>
-            )}
-            
         </div>
     );
 }

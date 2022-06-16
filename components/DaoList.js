@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { useContract, useSigner } from "wagmi";
-import CreateDaoPopUp from "./CreateDaoPopUp";
 import { DIS3CORD_ADDRESS } from "../Addresses";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
-import { useDispatch, useSelector } from "react-redux";
-import { refreshUserDaosAsync } from "../store/reducers/userdaoreducer";
+import Dis3DAO from "../artifacts/contracts/Dis3DAO.sol/Dis3DAO.json";
+import { ethers } from "ethers";
+import CreateDaoPopUp from "./CreateDaoPopUp";
 
-function DaoList({props}) {
+function DaoList({ props }) {
     const { data } = useSigner();
-    let dispatch = useDispatch();
-    let daos = useSelector((state) => state.userDaos);
+    let [daos, setDaos] = useState([]);
     let { setAddress } = props;
 
     const dis3cord = useContract({
@@ -18,15 +17,30 @@ function DaoList({props}) {
         signerOrProvider: data,
     });
 
+    async function load() {
+        let listOfDaos = await dis3cord.getUserDAOs();
+        let funcs = listOfDaos.map(async (addr, _) => {
+            let dis3dao = new ethers.Contract(addr, Dis3DAO.abi, data);
+            return {
+                name: await dis3dao.dname(),
+                addr: addr,
+                url: `https://ipfs.infura.io/ipfs/${await dis3dao.imageCID()}`,
+            };
+        });
+        Promise.all(funcs).then((vals) => {
+            setDaos(vals);
+        });
+    }
+
     useEffect(() => {
         if (data) {
-            dispatch(refreshUserDaosAsync(data, dis3cord));
+            load();
         }
     }, [data]);
 
     return (
         <div className="flex flex-col p-2 border-r-2 overscroll-contain">
-            <CreateDaoPopUp />
+            <CreateDaoPopUp props={{ daos, setDaos }} />
             {daos.map((val, i) => {
                 return (
                     <button
@@ -35,7 +49,15 @@ function DaoList({props}) {
                         key={i}
                         onClick={(_) => setAddress(val.addr)}
                     >
-                        <img src={val.url} alt={val.name} />
+                        <div
+                            className="h-full w-full"
+                            style={{
+                                backgroundImage: `url(${val.url.toString()})`,
+                                backgroundSize: "cover",
+                                backgroundRepeat: "no-repeat"
+                            }}
+                        />
+                        {/* <img src={val.url} alt={val.name} style={{backgroundSize:"48px"}} /> */}
                     </button>
                 );
             })}

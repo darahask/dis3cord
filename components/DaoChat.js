@@ -4,10 +4,12 @@ import {
     useMoralisQuery,
     useNewMoralisObject,
 } from "react-moralis";
+import { useAccount, useContract, useSigner } from "wagmi";
+import Dis3DAO from "../artifacts/contracts/Dis3DAO.sol/Dis3DAO.json";
 
 export default function DaoChat({ props }) {
     let { address } = props;
-    const { user, isAuthenticated } = useMoralis();
+    let { user, isAuthenticated } = useMoralis();
     const { save } = useNewMoralisObject("DAO_" + address.toString());
     const { fetch } = useMoralisQuery(
         "DAO_" + address.toString(),
@@ -16,6 +18,15 @@ export default function DaoChat({ props }) {
     );
     let [messages, setMessages] = useState([]);
     let messageRef = useRef();
+    let chatRef = useRef();
+    let titleRef = useRef();
+
+    let { data } = useSigner();
+    let dis3dao = useContract({
+        addressOrName: address.toString(),
+        signerOrProvider: data,
+        contractInterface: Dis3DAO.abi,
+    });
 
     function truncate(str) {
         let l = str.length - 1;
@@ -26,6 +37,10 @@ export default function DaoChat({ props }) {
         load();
     }, [address]);
 
+    useEffect(() => {
+        chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }, [messages]);
+
     let load = async () => {
         if (isAuthenticated) {
             loadMessages();
@@ -33,7 +48,7 @@ export default function DaoChat({ props }) {
     };
 
     let sendMessage = () => {
-        if (isAuthenticated)
+        if (isAuthenticated) {
             save(
                 {
                     message: messageRef.current.value.toString(),
@@ -56,10 +71,12 @@ export default function DaoChat({ props }) {
                     },
                 }
             );
+        }
     };
 
     let loadMessages = async () => {
         if (isAuthenticated) {
+            titleRef.current.innerText = (await dis3dao.dname()).toString() + " DAO";
             let res = await fetch();
             setMessages(
                 res.map((msg, _) => ({
@@ -74,11 +91,11 @@ export default function DaoChat({ props }) {
     return (
         <div className="grow ml-3">
             <div className="flex flex-col d-height pt-2">
-                <div></div>
-                <div className=" grow overflow-y-scroll ">
+                <div ref={titleRef} className="text-xl font-semibold mb-3 pl-2 drop-shadow border rounded-md"></div>
+                <div ref={chatRef} className=" grow overflow-y-scroll border rounded-md p-2">
                     {messages.map((msg, i) => (
-                        <div key={i} className="mb-2 ">
-                            <p className="font-semibold">
+                        <div key={i} className="mb-2 border-b">
+                            <p className="font-semibold text-red-600">
                                 {truncate(msg.user)}
                             </p>
                             <p className="text-lg">{msg.message}</p>
@@ -91,6 +108,9 @@ export default function DaoChat({ props }) {
                         ref={messageRef}
                         type="text"
                         placeholder="Enter message"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") sendMessage();
+                        }}
                     ></input>
                     <button
                         className="p-2 bg-black text-white rounded-lg ml-3"

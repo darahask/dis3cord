@@ -55,9 +55,11 @@ export default function Home() {
                         className="border shadow rounded-xl overflow-hidden"
                     >
                         <div
-                            className="image-fill h-48"
+                            className="h-48 w-full"
                             style={{
                                 backgroundImage: `url(${val.url.toString()})`,
+                                backgroundSize: "cover",
+                                backgroundRepeat: "no-repeat"
                             }}
                         />
                         <div className="p-4">

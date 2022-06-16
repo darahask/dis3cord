@@ -50,10 +50,12 @@ contract Dis3cord {
 
     function createDAO(
         string memory name,
+        uint256 price,
         string memory description,
         string memory imageCID
-    ) public {
-        Dis3DAO dao = new Dis3DAO(msg.sender, name, description, imageCID);
+    ) public returns (address daoAddr) {
+        Dis3DAO dao = new Dis3DAO(msg.sender, name, price, description, imageCID);
         daos.push(dao);
+        return address(dao);
     }
 }

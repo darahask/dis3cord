@@ -1,9 +1,7 @@
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { createClient, Provider } from "wagmi";
-import { Provider as StateProvider } from "react-redux";
 import Navbar from "../components/Navbar";
 import "../styles/globals.css";
-import store from "../store/store";
 import { MoralisProvider } from "react-moralis";
 
 const client = createClient({
@@ -18,10 +16,8 @@ function MyApp({ Component, pageProps }) {
             serverUrl={process.env.NEXT_PUBLIC_MORALIS_SERVER_URL}
         >
             <Provider client={client}>
-                <StateProvider store={store}>
-                    <Navbar />
-                    <Component {...pageProps} />
-                </StateProvider>
+                <Navbar />
+                <Component {...pageProps} />
             </Provider>
         </MoralisProvider>
     );

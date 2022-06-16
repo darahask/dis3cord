@@ -1,4 +1,3 @@
-// import { InjectedConnector } from "@wagmi/core";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useMoralis } from "react-moralis";
@@ -7,23 +6,17 @@ import { useAccount, useConnect } from "wagmi";
 export default function Navbar() {
     const { isConnected, connect, connectors } = useConnect();
     const { data } = useAccount();
-    const { authenticate, isAuthenticated, user } = useMoralis();
-    let addressStore = useRef("");
+    const { authenticate } = useMoralis();
 
-    async function load() {
-            await authenticate({
-                signingMessage: "Log in using Moralis",
+    useEffect(() => {
+        if(data){
+            authenticate({
+                signingMessage: "Sign in to Dis3cord chat services",
             }).catch(function (error) {
                 console.log(error);
             });
-    }
-
-    useEffect(() => {
-        if (data && addressStore.current !== data.address) {
-            addressStore.current = data.address;
-            load()
         }
-    }, [data]);
+    }, [data ? data.address : ""]);
 
     function truncate(str) {
         let l = str.length - 1;
@@ -33,7 +26,7 @@ export default function Navbar() {
     return (
         <div className="flex flex-row border-2 border-solid">
             <Link href="/">
-                <a className="flex-none font-bold ml-4 mt-1.5 text-2xl">
+                <a className="flex-none font-bold ml-3 mt-1.5 text-2xl">
                     Dis3cord
                 </a>
             </Link>

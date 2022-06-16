@@ -54,11 +54,13 @@ contract Dis3DAO is ERC721Enumerable {
     constructor(
         address daoOwner,
         string memory daoName,
+        uint256 price,
         string memory daoDescription,
         string memory daoImageCID
     ) ERC721(daoName, string(abi.encodePacked(daoName, "NFT"))) {
         owner = daoOwner;
         dname = daoName;
+        nftPrice = price;
         description = daoDescription;
         imageCID = daoImageCID;
         _safeMint(owner, tokenId);

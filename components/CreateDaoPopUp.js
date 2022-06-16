@@ -1,18 +1,19 @@
+import { ethers } from "ethers";
 import { create } from "ipfs-http-client";
 import { useRef } from "react";
-import { useDispatch } from "react-redux";
 import { useContract, useSigner } from "wagmi";
 import { DIS3CORD_ADDRESS } from "../Addresses";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
-import { refreshUserDaosAsync } from "../store/reducers/userdaoreducer";
 
 const client = create("https://ipfs.infura.io:5001/api/v0");
 
-export default function CreateDaoPopUp() {
+export default function CreateDaoPopUp({props}) {
     const formRef = useRef(0);
     const nameRef = useRef(0);
     const descRef = useRef(0);
     const fileRef = useRef(0);
+    const priceRef = useRef(0);
+    let {daos, setDaos} = props;
 
     let { data } = useSigner();
     let dis3cord = useContract({
@@ -20,7 +21,6 @@ export default function CreateDaoPopUp() {
         contractInterface: Dis3cord["abi"],
         signerOrProvider: data,
     });
-    let dispatch = useDispatch();
 
     let handleCreateDAO = (e) => {
         let curr = formRef.current;
@@ -36,6 +36,7 @@ export default function CreateDaoPopUp() {
         let fileCID = await client.add(fileRef.current.files[0]);
         let txn = await dis3cord.createDAO(
             nameRef.current.value,
+            ethers.utils.parseEther(priceRef.current.value),
             descRef.current.value,
             fileCID.path
         );
@@ -43,7 +44,11 @@ export default function CreateDaoPopUp() {
         nameRef.current.value = "";
         descRef.current.value = "";
         formRef.current.style.display = "none";
-        dispatch(refreshUserDaosAsync(data, dis3cord));
+        setDaos([...daos, {
+            name: nameRef.current.value,
+            addr: txn.toString(),
+            url: `https://ipfs.infura.io/ipfs/${fileCID.path}`,
+        }])
     };
 
     return (
@@ -70,7 +75,7 @@ export default function CreateDaoPopUp() {
 
             <div
                 ref={formRef}
-                className="fixed bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 border rounded-lg b-3 p-3 hidden"
+                className="fixed bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-1 border rounded-lg b-3 p-3 hidden drop-shadow-lg"
             >
                 <form onSubmit={handleFormSubmit}>
                     <div className="mb-6">
@@ -87,6 +92,23 @@ export default function CreateDaoPopUp() {
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                             required=""
                             placeholder="Name"
+                        />
+                    </div>
+                    <div className="mb-6">
+                        <label
+                            htmlFor="price"
+                            className="block mb-2 text-sm font-medium text-gray-900"
+                        >
+                            NFT Price in eth
+                        </label>
+                        <input
+                            ref={priceRef}
+                            type="number"
+                            step="any"
+                            id="price"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            required=""
+                            placeholder="Price"
                         />
                     </div>
                     <div className="mb-6">
