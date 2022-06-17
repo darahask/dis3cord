@@ -6,17 +6,22 @@ import { useAccount, useConnect } from "wagmi";
 export default function Navbar() {
     const { isConnected, connect, connectors } = useConnect();
     const { data } = useAccount();
-    const { authenticate } = useMoralis();
+    const { authenticate, isAuthenticated } = useMoralis();
+    let oldData = useRef({});
 
     useEffect(() => {
-        if (data) {
+        if (oldData.current !== data || !isAuthenticated) {
             authenticate({
                 signingMessage: "Sign in to Dis3cord chat services",
-            }).catch(function (error) {
-                console.log(error);
-            });
+            })
+                .then(function (user) {
+                    if (user) oldData.current = data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
-    }, [data ? data.address : ""]);
+    }, [data]);
 
     function truncate(str) {
         let l = str.length - 1;

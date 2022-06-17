@@ -1,24 +1,25 @@
 import { useState, useEffect } from "react";
-import { useContract, useSigner } from "wagmi";
+import { useContract, useNetwork, useSigner } from "wagmi";
 import Dis3cord from "../artifacts/contracts/Dis3cord.sol/Dis3cord.json";
 import Dis3DAO from "../artifacts/contracts/Dis3DAO.sol/Dis3DAO.json";
 import { ethers } from "ethers";
 import CreateDaoPopUp from "./CreateDaoPopUp";
 
-let { NEXT_PUBLIC_DIS3CORD_ADDRESS} = process.env;
+let { NEXT_PUBLIC_DIS3CORD_ADDRESS } = process.env;
 
 function DaoList({ props }) {
     const { data } = useSigner();
     let [daos, setDaos] = useState([]);
-    let { setAddress } = props;
+    let { setAddress, chain } = props;
 
-    const dis3cord = useContract({
+    let dis3cord = useContract({
         addressOrName: NEXT_PUBLIC_DIS3CORD_ADDRESS,
         contractInterface: Dis3cord.abi,
         signerOrProvider: data,
     });
 
     async function load() {
+        console.log("Loading...")
         let listOfDaos = await dis3cord.getUserDAOs();
         let funcs = listOfDaos.map(async (addr, _) => {
             let dis3dao = new ethers.Contract(addr, Dis3DAO.abi, data);
@@ -34,7 +35,7 @@ function DaoList({ props }) {
     }
 
     useEffect(() => {
-        if (data) {
+        if (data && chain === 5) {
             load();
         }
     }, [data]);
@@ -58,7 +59,6 @@ function DaoList({ props }) {
                                 backgroundRepeat: "no-repeat",
                             }}
                         />
-                        {/* <img src={val.url} alt={val.name} style={{backgroundSize:"48px"}} /> */}
                     </button>
                 );
             })}

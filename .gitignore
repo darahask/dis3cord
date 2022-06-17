@@ -39,4 +39,5 @@ typechain
 
 #Hardhat files
 cache
-artifacts
+artifacts/*
+!artifacts/contracts

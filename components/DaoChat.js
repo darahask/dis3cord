@@ -35,18 +35,12 @@ export default function DaoChat({ props }) {
     }
 
     useEffect(() => {
-        load();
+        loadMessages();
     }, [address]);
 
     useEffect(() => {
         chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }, [messages]);
-
-    let load = async () => {
-        if (isAuthenticated) {
-            loadMessages();
-        }
-    };
 
     let sendMessage = () => {
         if (isAuthenticated) {
